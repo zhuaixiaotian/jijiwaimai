@@ -2,8 +2,11 @@ package com.gigie.config;
 
 
 import com.gigie.interceptor.loginintercepton;
+import com.gigie.utils.JacksonObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -14,7 +17,7 @@ import java.util.List;
 
 /**拦截器的注册*/
 @Configuration //自动加载当前的类并进行拦截器的注册,如果没有@Configuration就相当于没有写类LoginInterceptorConfigure
-public class LoginInterceptorConfigure implements WebMvcConfigurer {
+public class Webmvcconfig implements WebMvcConfigurer {
     @Autowired
     private loginintercepton loginintercepton;
 
@@ -46,8 +49,15 @@ public class LoginInterceptorConfigure implements WebMvcConfigurer {
     }
 
 
-//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//        registry.addResourceHandler("/upload/**").addResourceLocations("F:/ssm demo/store/src/main/resources/static/upload/");
-//
-//    }
+    @Override
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        MappingJackson2HttpMessageConverter messageConverter=new MappingJackson2HttpMessageConverter();
+        messageConverter.setObjectMapper(new JacksonObjectMapper());
+            converters.add(0,messageConverter);
+
+
+
+
+
+    }
 }

@@ -92,7 +92,7 @@
       </el-table>
       <el-pagination
         class="pageList"
-        :page-sizes="[10, 20, 30, 40]"
+        :page-sizes="[2]"
         :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="counts"
@@ -118,7 +118,7 @@
              input: '',
              counts: 0,
              page: 1,
-             pageSize: 10,
+             pageSize: 2,
              tableData : [],
              id : '',
              status : '',
@@ -181,6 +181,11 @@
                 if (String(res.code) === '1') {
                   this.$message.success('账号状态更改成功！')
                   this.handleQuery()
+
+                }
+                else
+                {
+                  this.$message.error(res.msg)
                 }
               }).catch(err => {
                 this.$message.error('请求出错了：' + err)
