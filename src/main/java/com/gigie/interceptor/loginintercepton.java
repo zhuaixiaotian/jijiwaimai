@@ -1,5 +1,6 @@
 package com.gigie.interceptor;
 
+import com.gigie.utils.BaseContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,6 +25,8 @@ public class loginintercepton implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
                              Object handler) throws Exception {
+
+        BaseContext.setCurrentId(Thread.currentThread().getId());
         //通过HttpServletRequest对象来获取session对象
         Object obj = request.getSession().getAttribute("employee");
         if (obj == null) { //说明用户没有登录过系统,则重定向到login.html页面

@@ -103,11 +103,11 @@ public class employcontroller {
 
         String passwd= DigestUtils.md5DigestAsHex("123".getBytes());
         employe.setPassword(passwd);
-        employe.setCreateTime(LocalDateTime.now());
-        employe.setUpdateTime(LocalDateTime.now());
-        Long id = (Long)session.getAttribute("employee");
-        employe.setCreateUser(id);
-        employe.setUpdateUser(id);
+//        employe.setCreateTime(LocalDateTime.now());
+//        employe.setUpdateTime(LocalDateTime.now());
+//        Long id = (Long)session.getAttribute("employee");
+//        employe.setCreateUser(id);
+//        employe.setUpdateUser(id);
         if (!employservice.save(employe))
         {
             return R.error("用户添加失败");
@@ -140,8 +140,8 @@ public class employcontroller {
     @PutMapping
     public  R<Void> update(@RequestBody Employee employe)
     {
-            employe.setUpdateUser(1l);
-            employe.setUpdateTime(LocalDateTime.now());
+//            employe.setUpdateUser(1l);
+//            employe.setUpdateTime(LocalDateTime.now());
         boolean b = employservice.updateById(employe);
         if (!b)
         {

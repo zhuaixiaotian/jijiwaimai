@@ -1,5 +1,6 @@
 package com.gigie.exceptionhandler;
 
+import com.gigie.utils.CustomException;
 import com.gigie.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -22,20 +23,29 @@ public class GlobalExceptionHandler {
      * 异常处理方法
      * @return
      */
-    @ExceptionHandler(RuntimeException.class)
-    public R<String> handleException(RuntimeException ex){
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public R<String> handleException(SQLIntegrityConstraintViolationException ex){
         log.error(ex.getMessage());
 
         if(ex.getMessage().contains("Duplicate entry")){
             String[] split = ex.getMessage().split(" ");
-            String msg = split[2] + "用户已存在";
+            String msg = split[2] + "已存在";
             return R.error(msg);
-        }
-        else if (ex.getMessage().contains("修改失败"))
-        {
-            return R.error(ex.getMessage());
         }
 
         return R.error("未知错误");
     }
+
+    @ExceptionHandler(CustomException.class)
+    public R<String> handleException1(CustomException ex){
+        log.error(ex.getMessage());
+
+
+        return R.error(ex.getMessage());
+    }
+
+
+
+
+
 }
