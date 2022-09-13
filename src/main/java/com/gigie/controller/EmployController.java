@@ -23,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/employee")
-public class employcontroller {
+public class EmployController {
     @Autowired
     private employservice employservice;
 

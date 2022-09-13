@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.unit.DataSize;
 import org.springframework.util.unit.DataUnit;
 
@@ -14,6 +15,7 @@ import javax.servlet.MultipartConfigElement;
 @Slf4j
 @MapperScan("com.gigie.mapper")
 @SpringBootApplication
+@EnableTransactionManagement
 public class GigieApplication {
 
     public static void main(String[] args) {

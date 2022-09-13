@@ -19,7 +19,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/common")
-public class Commoncontroller {
+public class CommonController {
 
     @PostMapping("/upload")
     public R<String> upload  (MultipartFile file)
@@ -71,6 +71,18 @@ public class Commoncontroller {
 
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
