@@ -6,4 +6,8 @@ import com.gigie.domain.Dish;
 
 public interface DishService extends IService<Dish> {
     void saveflavor(DishDto dishDto);
+
+    DishDto getflavorbyid(Long id);
+
+    void updatewithflavor(DishDto dishDto);
 }
