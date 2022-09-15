@@ -27,17 +27,30 @@ public class Webmvcconfig implements WebMvcConfigurer {
         //1.创建自定义的拦截器对象
 
         //2.配置白名单并存放在一个List集合
+
+        //pc 端口
         List<String> patterns = new ArrayList<>();
         patterns.add("/backend/api/**");
         patterns.add("/backend/images/**");
         patterns.add("/backend/js/**");
         patterns.add("/backend/plugins/**");
         patterns.add("/backend/styles/**");
-
         patterns.add("/backend/page/login/login.html");
         patterns.add("/employee/login");
         patterns.add("/employee/logout");
-        patterns.add("/front/**");
+
+
+
+
+
+        // 移动端
+        patterns.add("/front/api/**");
+        patterns.add("/front/fonts/**");
+        patterns.add("/front/images/**");
+        patterns.add("/front/styles/**");
+        patterns.add("/front/js/**");
+        patterns.add("/front/page/login.html");
+        patterns.add("/front/cartData.json");
         patterns.add("/user/login");
         patterns.add("/user/sendMsg");
 

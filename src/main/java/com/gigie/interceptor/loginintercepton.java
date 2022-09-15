@@ -46,7 +46,7 @@ public class loginintercepton implements HandlerInterceptor {
             //页面,但前面的localhost:8080可以省略,因为在同一个项目下
             Long userid=(Long) obj2;
             BaseContext.setCurrentId(userid);
-
+//            response.sendRedirect("/front/page/login.html");
             //结束后续的调用
             return true;
         }
