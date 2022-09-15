@@ -56,7 +56,7 @@ public class CategoryController {
 
     /**
      * 根据id删除分类
-     * @param id
+     * @param
      * @return
      */
     @DeleteMapping

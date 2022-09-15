@@ -83,11 +83,16 @@ public class DishController {
 
 
     @DeleteMapping
-    public R<Void> delete(String ids)
+    public R<Void> delete(@RequestParam List<Long> ids)
     {
-        String[] split = ids.split(",");
-        List<String> list = Arrays.asList(split);
-          dishService.removeByIds(list);
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Dish ::getId,ids);
+        queryWrapper.eq(Dish ::getStatus,1);
+        int count = dishService.count(queryWrapper);
+        if (count > 0)
+            return  R.error("菜品销售中,无法删除");
+
+        dishService.removeByIds(ids);
         return  R.success(null);
     }
 
@@ -111,6 +116,7 @@ public class DishController {
     public R<DishDto> getById(@PathVariable Long id)
     {
        return  R.success(dishService.getflavorbyid(id));
+
     }
 
     @PutMapping()
@@ -122,5 +128,17 @@ public class DishController {
         return R.success(null);
     }
 
+    @GetMapping("/list")
+    public  R<List<Dish>> getList(Dish dish)
+    {
 
+        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Dish ::getCategoryId,dish.getCategoryId()).
+                orderByDesc(Dish::getUpdateTime).eq(Dish::getStatus,1);//启售状态
+        List<Dish> list = dishService.list(queryWrapper);
+
+
+        return R.success(list);
+
+    }
 }
