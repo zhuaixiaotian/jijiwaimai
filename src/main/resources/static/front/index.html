@@ -429,6 +429,7 @@
                 this.dishList.forEach(dish=>{
                   if(dish.id === item.id){
                     dish.number = (res.data.number === 0 ? undefined : res.data.number)
+
                   }
                 })
                 if(this.setMealDialog.show){

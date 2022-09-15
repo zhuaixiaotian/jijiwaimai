@@ -55,10 +55,10 @@ public class EmployController {
     }
 
     @PostMapping("/logout")
-    public R<Void> logout(HttpSession session)
+    public R<String> logout(HttpSession session)
     {
         session.removeAttribute("employee");
-        return R.success(null);
+        return R.success("登出成功");
     }
 
 //    @PostMapping("/register")
@@ -89,7 +89,7 @@ public class EmployController {
 
 
     @PostMapping
-    public R<Void> addnew(HttpSession session,@RequestBody Employee employe )
+    public R<String> addnew(HttpSession session,@RequestBody Employee employe )
     {
         log.info(employe.toString());
 
@@ -113,7 +113,7 @@ public class EmployController {
             return R.error("用户添加失败");
         }
 
-        return  R.success(null);
+        return  R.success("添加员工成功");
 
     }
     @GetMapping("/page")
@@ -138,7 +138,7 @@ public class EmployController {
     }
 
     @PutMapping
-    public  R<Void> update(@RequestBody Employee employe)
+    public  R<String> update(@RequestBody Employee employe)
     {
 //            employe.setUpdateUser(1l);
 //            employe.setUpdateTime(LocalDateTime.now());
@@ -147,7 +147,7 @@ public class EmployController {
         {
             throw new RuntimeException("修改失败");
         }
-        return  R.success(null);
+        return  R.success("更新员工信息成功");
 
     }
 

@@ -51,7 +51,7 @@ public class loginintercepton implements HandlerInterceptor {
             return true;
         }
         //放行这个请求
-        return false;
+        return true;
     }
 
 

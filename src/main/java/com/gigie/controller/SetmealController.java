@@ -17,6 +17,7 @@ import com.gigie.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.omg.CORBA.PRIVATE_MEMBER;
+import org.omg.PortableServer.LifespanPolicyOperations;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @Slf4j
@@ -38,10 +40,10 @@ public class SetmealController {
     @Autowired
     private CategoryService CategoryService;
     @PostMapping
-    public R<Void> addsetmeal(@RequestBody SetmealDto setmealDto)
+    public R<String> addsetmeal(@RequestBody SetmealDto setmealDto)
     {
         SetmealService.savemeal_dish(setmealDto);
-        return R.success(null);
+        return R.success("添加套餐成功");
 
     }
 
@@ -81,7 +83,7 @@ public class SetmealController {
 
 
     @PostMapping("/status/{id}")
-    public  R<Void> changestatus(@PathVariable int id,String ids)
+    public  R<String> changestatus(@PathVariable int id,String ids)
     {
         log.info(id+"");
         log.info(ids);
@@ -91,12 +93,12 @@ public class SetmealController {
         queryWrapper.in(Setmeal ::getId,split);
         SetmealService.update(queryWrapper);
 
-        return R.success(null);
+        return R.success("修改套餐状态成功");
 
     }
     @DeleteMapping
     @Transactional
-    public R<Void> delete(@RequestParam List<Long> ids)
+    public R<String> delete(@RequestParam List<Long> ids)
     {
         LambdaUpdateWrapper<Setmeal> queryWrapper = new LambdaUpdateWrapper<>();
         queryWrapper.in(Setmeal ::getId,ids);
@@ -110,7 +112,7 @@ public class SetmealController {
         queryWrap.in(SetmealDish ::getSetmealId,ids);
         setmealdishservice.remove(queryWrap);
 
-        return  R.success(null);
+        return  R.success("删除套餐成功");
     }
 
     /**
@@ -124,10 +126,32 @@ public class SetmealController {
         return R.success(setmealDto);
     }
     @PutMapping
-    public  R<Void> update(@RequestBody SetmealDto setmealDto) {
+    public  R<String> update(@RequestBody SetmealDto setmealDto) {
         SetmealService.updatedish(setmealDto);
-        return R.success(null);
+        return R.success("更新套餐成功");
     }
+
+    @GetMapping("/list")
+    public R<List<Setmeal>> getList(Long categoryId,int status)
+    {
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Setmeal ::getCategoryId,categoryId);
+        queryWrapper.eq(Setmeal ::getStatus,status);
+        queryWrapper.orderByDesc(Setmeal ::getUpdateTime);
+        List<Setmeal> list = SetmealService.list(queryWrapper);
+
+        return R.success(list);
+    }
+
+    @GetMapping("/dish/{id}")
+    public  R<List<SetmealDish>> getDish(@PathVariable Long id)
+    {
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SetmealDish ::getSetmealId,id);
+        List<SetmealDish> list = setmealdishservice.list(queryWrapper);
+        return  R.success(list);
+    }
+
 
 
 }
