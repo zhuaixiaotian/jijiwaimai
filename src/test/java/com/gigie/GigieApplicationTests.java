@@ -13,10 +13,9 @@ class GigieApplicationTests {
     private SetmealMapper s;
     @Test
     void contextLoads() {
-        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
-
-        Setmeal setmeal = s.selectById(1415580119015145474L);
-        System.out.println(setmeal);
+        Long x=(Long) null;
+        System.out.println(x);
     }
+
 
 }

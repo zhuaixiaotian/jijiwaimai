@@ -12,11 +12,3 @@ function logoutApi(){
     'method': 'post',
   })
 }
-
-
-function registerApi(){
-  return $axios({
-    'url': '/employee/register',
-    'method': 'post',
-  })
-}

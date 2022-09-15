@@ -26,18 +26,32 @@ public class loginintercepton implements HandlerInterceptor {
                              HttpServletResponse response,
                              Object handler) throws Exception {
 
-        BaseContext.setCurrentId(Thread.currentThread().getId());
-        //通过HttpServletRequest对象来获取session对象
+
+//        通过HttpServletRequest对象来获取session对象
         Object obj = request.getSession().getAttribute("employee");
-        if (obj == null) { //说明用户没有登录过系统,则重定向到login.html页面
+        if (obj != null) {
+            Long empid=(Long) obj;
+            BaseContext.setCurrentId(empid);
+
+//
+//            response.sendRedirect("/backend/page/login/login.html");
+            //停止后续的调用
+            return true;
+        }
+
+        Object obj2 = request.getSession().getAttribute("user");
+
+        if (obj2 != null) { //说明用户没有登录过系统,则重定向到login.html页面
             //不能用相对路径,因为这里是要告诉前端访问的新页面是在哪个目录下的新
             //页面,但前面的localhost:8080可以省略,因为在同一个项目下
-            response.sendRedirect("/backend/page/login/login.html");
+            Long userid=(Long) obj2;
+            BaseContext.setCurrentId(userid);
+
             //结束后续的调用
-            return false;
+            return true;
         }
         //放行这个请求
-        return true;
+        return false;
     }
 
 

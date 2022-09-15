@@ -36,7 +36,11 @@ public class Webmvcconfig implements WebMvcConfigurer {
 
         patterns.add("/backend/page/login/login.html");
         patterns.add("/employee/login");
+        patterns.add("/employee/logout");
         patterns.add("/front/**");
+        patterns.add("/user/login");
+        patterns.add("/user/sendMsg");
+
 
         //registry.addInterceptor(interceptor);完成拦截
         // 器的注册,后面的addPathPatterns表示拦截哪些url
