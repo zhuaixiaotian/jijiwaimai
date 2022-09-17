@@ -92,4 +92,14 @@ public class UserController {
         return R.error("登录失败");
     }
 
+
+
+    // TODO: 2022/9/17   移动端退出登录wd
+
+    @PostMapping("/loginout")
+    public  R<String> loginout(HttpSession session)
+    {
+        session.removeAttribute("user");
+        return R.success("退出登录成功");
+    }
 }

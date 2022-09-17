@@ -1,12 +1,15 @@
 package com.gigie.interceptor;
 
+import com.alibaba.fastjson.JSON;
 import com.gigie.utils.BaseContext;
+import com.gigie.utils.R;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 
 @Component
 public class loginintercepton implements HandlerInterceptor {
@@ -32,7 +35,6 @@ public class loginintercepton implements HandlerInterceptor {
         if (obj != null) {
             Long empid=(Long) obj;
             BaseContext.setCurrentId(empid);
-
 //
 //            response.sendRedirect("/backend/page/login/login.html");
             //停止后续的调用
@@ -48,10 +50,12 @@ public class loginintercepton implements HandlerInterceptor {
             BaseContext.setCurrentId(userid);
 //            response.sendRedirect("/front/page/login.html");
             //结束后续的调用
+
             return true;
         }
-        //放行这个请求
-        return true;
+        PrintWriter writer = response.getWriter();
+        writer.write(JSON.toJSONString(R.error("NOTLOGIN")));
+        return false;
     }
 
 

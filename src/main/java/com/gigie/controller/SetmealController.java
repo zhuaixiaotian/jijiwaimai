@@ -5,14 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gigie.DTO.DishDto;
 import com.gigie.DTO.SetmealDto;
-import com.gigie.domain.Category;
-import com.gigie.domain.Dish;
-import com.gigie.domain.Setmeal;
-import com.gigie.domain.SetmealDish;
-import com.gigie.service.CategoryService;
-import com.gigie.service.SetmealService;
-import com.gigie.service.setmealdishservice;
+import com.gigie.domain.*;
+import com.gigie.service.*;
 import com.gigie.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -34,15 +30,21 @@ import java.util.Set;
 @RequestMapping("/setmeal")
 public class SetmealController {
     @Autowired
+    private DishService dishService;
+    @Autowired
     private SetmealService SetmealService;
     @Autowired
     private setmealdishservice setmealdishservice;
     @Autowired
     private CategoryService CategoryService;
+    @Autowired
+    private DishFlavorservice DishFlavorservice;
+
     @PostMapping
     public R<String> addsetmeal(@RequestBody SetmealDto setmealDto)
     {
         SetmealService.savemeal_dish(setmealDto);
+
         return R.success("添加套餐成功");
 
     }
@@ -83,15 +85,28 @@ public class SetmealController {
 
 
     @PostMapping("/status/{id}")
-    public  R<String> changestatus(@PathVariable int id,String ids)
+    @Transactional
+    public  R<String> changestatus(@PathVariable int id,@RequestParam List<Long> ids)
     {
-        log.info(id+"");
-        log.info(ids);
-        String[] split = ids.split(",");
-        LambdaUpdateWrapper<Setmeal> queryWrapper = new LambdaUpdateWrapper<>();
-        queryWrapper.set(Setmeal ::getStatus,id);
-        queryWrapper.in(Setmeal ::getId,split);
-        SetmealService.update(queryWrapper);
+        // 给套餐停售卖
+        SetmealService.changestatus(id,ids);
+        if (id==1) {
+
+            //给菜品停售
+            LambdaQueryWrapper<SetmealDish> setmealDishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            setmealDishLambdaQueryWrapper.in(SetmealDish::getSetmealId, ids);
+            List<SetmealDish> list = setmealdishservice.list(setmealDishLambdaQueryWrapper);
+            List<Long> dishid = new ArrayList<>();
+            log.info("dishid{}", dishid);
+            for (SetmealDish setmealDish : list) {
+                dishid.add(setmealDish.getDishId());
+            }
+            //给菜品启售
+            dishService.changestatus(id,dishid);
+        }
+
+
+
 
         return R.success("修改套餐状态成功");
 
@@ -106,6 +121,7 @@ public class SetmealController {
         int count = SetmealService.count(queryWrapper);
         if (count > 0)
             return  R.error("套餐销售中,无法删除");
+
 
         SetmealService.removeByIds(ids);
         LambdaUpdateWrapper<SetmealDish> queryWrap = new LambdaUpdateWrapper<>();
@@ -144,12 +160,26 @@ public class SetmealController {
     }
 
     @GetMapping("/dish/{id}")
-    public  R<List<SetmealDish>> getDish(@PathVariable Long id)
+    public  R<List<DishDto>> getDish(@PathVariable Long id)
     {
         LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SetmealDish ::getSetmealId,id);
         List<SetmealDish> list = setmealdishservice.list(queryWrapper);
-        return  R.success(list);
+        List<DishDto> listDTO=new ArrayList<>();
+        for (SetmealDish setmealDish : list) {
+            Dish dish = dishService.getById(setmealDish.getDishId());
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(dish, dishDto);
+            dishDto.setCopies(setmealDish.getCopies());
+            // 不返回口味
+//            LambdaQueryWrapper<DishFlavor> queryWrap=new LambdaQueryWrapper<>();
+//            queryWrap.eq(DishFlavor::getDishId,dish.getId());
+//            List<DishFlavor> list1 = DishFlavorservice.list(queryWrap);
+//            dishDto.setFlavors(list1);
+            listDTO.add(dishDto);
+        }
+            return  R.success(listDTO);
+
     }
 
 

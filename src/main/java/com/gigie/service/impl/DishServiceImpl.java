@@ -10,12 +10,14 @@ import com.gigie.domain.DishFlavor;
 import com.gigie.mapper.DishMapper;
 import com.gigie.service.DishFlavorservice;
 import com.gigie.service.DishService;
+import com.gigie.utils.CustomException;
 import com.gigie.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +33,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     @Override
     @Transactional
     public void saveflavor(DishDto dishDto) {
-        this.save(dishDto);
+        if (!this.save(dishDto))
+        {
+          throw new CustomException("添加菜品失败");
+        }
 
         List<DishFlavor> flavors = dishDto.getFlavors();
         Long id=dishDto.getId();
@@ -39,7 +44,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             flavor.setDishId(id);
         }
 
-        dishFlavorservice.saveBatch(flavors);
+        if(!dishFlavorservice.saveBatch(flavors))
+        {
+            throw new CustomException("添加菜品口味失败");
+        }
 
 
     }
@@ -58,9 +66,13 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     }
 
-    @Override @Transactional
+    @Override
+    @Transactional
     public void updatewithflavor(DishDto dishDto) {
-        this.updateById(dishDto);
+        if(!this.updateById(dishDto))
+        {
+            throw new CustomException("更新菜品失败");
+        }
         LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(DishFlavor::getDishId,dishDto.getId());
         dishFlavorservice.remove(queryWrapper);
@@ -70,8 +82,21 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             flavor.setDishId(id);
         }
 
-        dishFlavorservice.saveBatch(flavors);
+        if(!dishFlavorservice.saveBatch(flavors))
+        {
+            throw new CustomException("更新菜品口味失败");
+        }
 
+
+    }
+
+    @Override
+    public void changestatus(int id,  List<Long> ids) {
+
+        LambdaUpdateWrapper<Dish> queryWrapper = new LambdaUpdateWrapper<>();
+        queryWrapper.set(Dish ::getStatus,id);
+        queryWrapper.in(Dish ::getId,ids);
+        this.update(queryWrapper);
 
     }
 }

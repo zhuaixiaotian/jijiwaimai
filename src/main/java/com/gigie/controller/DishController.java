@@ -10,14 +10,15 @@ import com.gigie.DTO.DishDto;
 import com.gigie.domain.Category;
 import com.gigie.domain.Dish;
 import com.gigie.domain.DishFlavor;
-import com.gigie.service.CategoryService;
-import com.gigie.service.DishFlavorservice;
-import com.gigie.service.DishService;
+import com.gigie.domain.SetmealDish;
+import com.gigie.service.*;
 import com.gigie.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.management.LockInfo;
@@ -35,9 +36,11 @@ public class DishController {
     private  DishFlavorservice dishFlavorservice;
     @Autowired
     private CategoryService CategoryService;
-
+    @Autowired
+    private setmealdishservice setmealdishservice;
+    @Autowired
+    private SetmealService SetmealService;
     @PostMapping
-
     public R<String> addnewdish(@RequestBody  DishDto dishDto)
     {
         log.info(dishDto.getImage());
@@ -81,7 +84,7 @@ public class DishController {
 
     }
 
-
+    @Transactional
     @DeleteMapping
     public R<String> delete(@RequestParam List<Long> ids)
     {
@@ -91,22 +94,96 @@ public class DishController {
         int count = dishService.count(queryWrapper);
         if (count > 0)
             return  R.error("菜品销售中,无法删除");
+        LambdaQueryWrapper<SetmealDish> queryWrap = new LambdaQueryWrapper<>();
+        queryWrap.in(SetmealDish::getDishId, ids);
+        List<SetmealDish> list = setmealdishservice.list(queryWrap);
 
+        List<Long> setmeallist=null;
+        if (list !=null && list.size() > 0)
+
+        {
+            Set<Long> set = new HashSet<>();
+        //给套餐id去重
+        for (SetmealDish setmealDish : list) {
+            set.add(setmealDish.getSetmealId());
+        }
+        setmeallist = new ArrayList<>(set);
+
+        }
+        //删除菜品
         dishService.removeByIds(ids);
+        LambdaUpdateWrapper<SetmealDish> q = new LambdaUpdateWrapper<>();
+        q.in(SetmealDish ::getDishId,ids);
+        setmealdishservice.remove(q);
+        if (list==null || list.size() == 0)
+            return R.success("删除成功");
+
+        for (Long aLong : setmeallist) {
+            LambdaQueryWrapper<SetmealDish> setmealDish=new LambdaQueryWrapper<>();
+            setmealDish.eq(SetmealDish ::getSetmealId,aLong);
+            List<SetmealDish> list1 = setmealdishservice.list(setmealDish);
+            if (list1==null || list1.size() == 0)
+            {
+                SetmealService.removeById(aLong);
+            }
+        }
+
+
+//        LambdaQueryWrapper<SetmealDish> queryWrap = new LambdaQueryWrapper<>();
+//        queryWrap.in(SetmealDish::getDishId, ids);
+//        List<SetmealDish> list = setmealdishservice.list(queryWrap);
+//        if (list == null || list.size() == 0)
+//            return R.success("修改状态成功");
+//        Set<Long> set = new HashSet<>();
+//        //给套餐id去重
+//        for (SetmealDish setmealDish : list) {
+//            set.add(setmealDish.getSetmealId());
+//        }
+//        List<Long> setmeallist = new ArrayList<>(set);
+//        for (Long setmealid : setmeallist) {
+//            LambdaQueryWrapper<SetmealDish> q=new LambdaQueryWrapper<>();
+//            q.eq(SetmealDish ::getSetmealId,setmealid);
+//            List<SetmealDish> list1 = setmealdishservice.list(q);
+//            List<Long> dish=new ArrayList<>();
+//            for (SetmealDish setmealDish : list1) {
+//                dish.add(setmealDish.getDishId());
+//            }
+//            if (ids.containsAll(dish))
+//            {
+//                //删除菜品和 关联记录
+//
+//            }
+//
+//        }
+
+
         return  R.success("删除菜品成功");
     }
 
 
     @PostMapping("/status/{id}")
-    public  R<String> changestatus(@PathVariable int id,String ids)
+    @Transactional
+    public  R<String> changestatus(@PathVariable int id,@RequestParam List<Long> ids)
     {
-        log.info(id+"");
-        log.info(ids);
-        String[] split = ids.split(",");
-        LambdaUpdateWrapper<Dish> queryWrapper = new LambdaUpdateWrapper<>();
-        queryWrapper.set(Dish ::getStatus,id);
-        queryWrapper.in(Dish ::getId,split);
-        dishService.update(queryWrapper);
+
+
+        // 给菜品停售
+        dishService.changestatus(id,ids);
+        if (id==0) {
+            LambdaQueryWrapper<SetmealDish> queryWrap = new LambdaQueryWrapper<>();
+            queryWrap.in(SetmealDish::getDishId, ids);
+            List<SetmealDish> list = setmealdishservice.list(queryWrap);
+            if (list == null || list.size() == 0) {
+                return R.success("修改状态成功");
+            }
+
+            Set<Long> set = new HashSet<>();
+            for (SetmealDish setmealDish : list) {
+                set.add(setmealDish.getSetmealId());
+            }
+            List<Long> setmeallist = new ArrayList<>(set);
+            SetmealService.changestatus(id, setmeallist);
+        }
 
         return R.success("修改状态成功");
 

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gigie.DTO.SetmealDto;
 import com.gigie.domain.Setmeal;
 
+import java.util.List;
+
 public interface SetmealService extends IService<Setmeal> {
     void savemeal_dish(SetmealDto setmealDto);
     /**
@@ -13,4 +15,6 @@ public interface SetmealService extends IService<Setmeal> {
     SetmealDto getDate(Long id);
 
     void updatedish(SetmealDto setmealDto);
+
+    void changestatus(int id, List<Long> ids);
 }

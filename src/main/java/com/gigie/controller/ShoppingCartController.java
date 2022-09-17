@@ -7,6 +7,7 @@ import com.gigie.utils.BaseContext;
 import com.gigie.utils.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -74,15 +75,14 @@ public class ShoppingCartController {
     @GetMapping("/clean")
      public  R<String> clean()
     {
-        LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(ShoppingCart ::getUserId,BaseContext.getCurrentId());
-        shoppingCartService.remove(queryWrapper);
+       shoppingCartService.clean();
         return R.success("清空购物车成功");
 
 
     }
 
     @PostMapping("sub")
+    @Transactional
     public R<ShoppingCart> delete(@RequestBody ShoppingCart cart)
 
     {
@@ -102,21 +102,25 @@ public class ShoppingCartController {
         {
             return R.error("购物车不存在");
         }
-        if (one.getNumber()==1)
+
+        Integer number = one.getNumber();
+        if (number==1)
         {
             shoppingCartService.removeById(one);
-            one=null;
         }
-        else
+        else if (number>1)
         {
-            Integer number = one.getNumber();
             one.setNumber(number-1);
             shoppingCartService.updateById(one);
         }
-
+        else
+        {
+            return R.error("购物车不存在");
+        }
 
 
         return R.success(one);
     }
 
 }
+
