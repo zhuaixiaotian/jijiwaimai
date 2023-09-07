@@ -1,7 +1,9 @@
 package com.gigie.controller;
 
 import com.gigie.utils.R;
+import javafx.scene.effect.Blend;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,10 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.UUID;
 
 @Slf4j
@@ -56,14 +55,15 @@ public class CommonController {
         try {
             FileInputStream fileInputStream = new FileInputStream("d:\\sd\\img\\"+name);
             ServletOutputStream outputStream = response.getOutputStream();
-            byte[] bytes = new byte[1024];
             response.setContentType("image/jpg");
-            int len=0;
-            while((len = fileInputStream.read(bytes))!=-1)
-            {
-                outputStream.write(bytes, 0, len);
-                outputStream.flush();
-            }
+            byte[] bytes = new byte[1024];
+//            int len=0;
+//            while((len = fileInputStream.read(bytes))!=-1)
+//            {
+//                outputStream.write(bytes,0,len);
+//                outputStream.flush();
+//            }
+            IOUtils.copy(fileInputStream,outputStream);
                 outputStream.close();
                 fileInputStream.close();
 

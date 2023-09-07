@@ -30,22 +30,21 @@ import java.util.Map;
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements DishService {
     @Autowired
     private DishFlavorservice dishFlavorservice;
+
     @Override
     @Transactional
     public void saveflavor(DishDto dishDto) {
-        if (!this.save(dishDto))
-        {
-          throw new CustomException("添加菜品失败");
+        if (!this.save(dishDto)) {
+            throw new CustomException("添加菜品失败");
         }
 
         List<DishFlavor> flavors = dishDto.getFlavors();
-        Long id=dishDto.getId();
+        Long id = dishDto.getId();
         for (DishFlavor flavor : flavors) {
             flavor.setDishId(id);
         }
 
-        if(!dishFlavorservice.saveBatch(flavors))
-        {
+        if (!dishFlavorservice.saveBatch(flavors)) {
             throw new CustomException("添加菜品口味失败");
         }
 
@@ -57,33 +56,31 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         Dish byId = this.getById(id);
         Long id1 = byId.getId();
         LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(DishFlavor ::getDishId,id1);
+        queryWrapper.eq(DishFlavor::getDishId, id1);
         List<DishFlavor> list = dishFlavorservice.list(queryWrapper);
         DishDto dishDto = new DishDto();
-        BeanUtils.copyProperties(byId,dishDto);
+        BeanUtils.copyProperties(byId, dishDto);
         dishDto.setFlavors(list);
-        return  dishDto;
+        return dishDto;
 
     }
 
     @Override
     @Transactional
     public void updatewithflavor(DishDto dishDto) {
-        if(!this.updateById(dishDto))
-        {
+        if (!this.updateById(dishDto)) {
             throw new CustomException("更新菜品失败");
         }
         LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(DishFlavor::getDishId,dishDto.getId());
+        queryWrapper.eq(DishFlavor::getDishId, dishDto.getId());
         dishFlavorservice.remove(queryWrapper);
         List<DishFlavor> flavors = dishDto.getFlavors();
-        Long id=dishDto.getId();
+        Long id = dishDto.getId();
         for (DishFlavor flavor : flavors) {
             flavor.setDishId(id);
         }
 
-        if(!dishFlavorservice.saveBatch(flavors))
-        {
+        if (!dishFlavorservice.saveBatch(flavors)) {
             throw new CustomException("更新菜品口味失败");
         }
 
@@ -91,11 +88,11 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
-    public void changestatus(int id,  List<Long> ids) {
+    public void changestatus(int id, List<Long> ids) {
 
         LambdaUpdateWrapper<Dish> queryWrapper = new LambdaUpdateWrapper<>();
-        queryWrapper.set(Dish ::getStatus,id);
-        queryWrapper.in(Dish ::getId,ids);
+        queryWrapper.set(Dish::getStatus, id);
+        queryWrapper.in(Dish::getId, ids);
         this.update(queryWrapper);
 
     }
